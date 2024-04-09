@@ -13,21 +13,14 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // react-router-dom components
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
-import Grid from "@mui/material/Grid";
-import MuiLink from "@mui/material/Link";
-
-// @mui icons
-import FacebookIcon from "@mui/icons-material/Facebook";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import GoogleIcon from "@mui/icons-material/Google";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -40,91 +33,144 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import api from "api/api";
+//constants
+import { AUTH_LOGIN, AUTH_USER } from "../../../constants/ApiRoutes";
+//schema
+// import LoginSchemaValidation from "utils/validations/LoginSchemaValidation";
 
-function Basic() {
+// import { Controller, useForm, SubmitHandler } from "react-hook-form";
+// import { yupResolver } from "@hookform/resolvers/yup";
+import { Button, Input } from "@mui/material";
+
+function Basic(navigation) {
   const [rememberMe, setRememberMe] = useState(false);
+  const [data, setData] = useState();
+  const [formData, setFormData] = useState({
+    login: "",
+    password: "",
+  });
+  const navigate = useNavigate();
+
+  //   const {
+  //     control,
+  //     register,
+  //     handleSubmit,
+  //     onSubmit,
+  //     formState: { errors },
+  //   } = useForm({
+  //     resolver: yupResolver(LoginSchemaValidation),
+  //   });
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    fetchUser();
+  };
+
+  const findUser = async () => {
+    api.get(AUTH_USER).then((response) => {
+      if (Object.keys(response.data).length !== 0) {
+        storeData(response.data);
+      }
+    });
+  };
+
+  const storeData = async (user) => {
+    localStorage.setItem("user", JSON.stringify(user));
+  };
+
+  const fetchUser = async () => {
+    const payload = {
+      login: formData.login,
+      password: formData.password,
+    };
+    await api
+      .post(AUTH_LOGIN, payload)
+      .then((response) => {
+        const { token_type, token } = response.data;
+        localStorage.setItem("token", `${token_type} ${token}`);
+        if (Object.keys(response.data).length !== 0) {
+          findUser(response.data);
+        }
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  //   const submitLogin = (data) => {
+  //     console.log("clicou");
+  //     console.log(data);
+  //     return;
+  //     fetchUser(data);
+  //   };
+
   return (
-    <BasicLayout image={bgImage}>
-      <Card>
-        <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="info"
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
-        >
-          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            Sign in
-          </MDTypography>
-          <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <FacebookIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <GitHubIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <GoogleIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-          </Grid>
-        </MDBox>
-        <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
-            <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
-            </MDBox>
-            <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
-            </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-              >
-                &nbsp;&nbsp;Remember me
-              </MDTypography>
-            </MDBox>
-            <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
-                sign in
-              </MDButton>
-            </MDBox>
-            <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
-                Don&apos;t have an account?{" "}
-                <MDTypography
-                  component={Link}
-                  to="/authentication/sign-up"
-                  variant="button"
+    <form onSubmit={handleSubmit}>
+      <BasicLayout image={bgImage}>
+        <Card>
+          <MDBox
+            variant="gradient"
+            bgColor="info"
+            borderRadius="lg"
+            coloredShadow="info"
+            mx={2}
+            mt={-3}
+            p={2}
+            mb={1}
+            textAlign="center"
+          >
+            <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+              Controle de Estoque
+            </MDTypography>
+          </MDBox>
+          <MDBox pt={4} pb={3} px={3}>
+            <MDBox>
+              <MDBox mb={2}>
+                {/* <MDInput label="Login" {...register("login")} fullWidth />
+                {errors.login?.type === "required" && (
+                  <MDTypography>O login é obrigatório</MDTypography>
+                )} */}
+                <MDInput name="login" label="Login" onChange={handleChange} fullWidth />
+              </MDBox>
+              <MDBox mb={2}>
+                {/* <MDInput type="password" label="Password" {...register("password")} fullWidth />
+              {errors.password && (
+                <MDTypography variant="h2">{errors.password.message}</MDTypography>
+              )} */}
+                <MDInput
+                  name="password"
+                  type="password"
+                  label="Password"
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </MDBox>
+              <MDBox mt={4} mb={1}>
+                <MDButton
+                  type="submit"
+                  variant="gradient"
                   color="info"
-                  fontWeight="medium"
-                  textGradient
+                  onSubmit={handleSubmit}
+                  // onPress={handleSubmit(submitLogin)}
+                  fullWidth
                 >
-                  Sign up
-                </MDTypography>
-              </MDTypography>
+                  Entrar
+                </MDButton>
+              </MDBox>
             </MDBox>
           </MDBox>
-        </MDBox>
-      </Card>
-    </BasicLayout>
+        </Card>
+      </BasicLayout>
+    </form>
   );
 }
 

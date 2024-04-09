@@ -13,7 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-/** 
+/**
   All of the routes for the Material Dashboard 2 React are added here,
   You can add a new route, customize the routes and delete the routes here.
 
@@ -22,7 +22,7 @@ Coded by www.creative-tim.com
 
   For adding a new route you can follow the existing routes in the routes array.
   1. The `type` key with the `collapse` value is used for a route.
-  2. The `type` key with the `title` value is used for a title inside the Sidenav. 
+  2. The `type` key with the `title` value is used for a title inside the Sidenav.
   3. The `type` key with the `divider` value is used for a divider between Sidenav items.
   4. The `name` key is used for the name of the route on the Sidenav.
   5. The `key` key is used for the key of the route (It will help you with the key prop inside a loop).
@@ -47,39 +47,34 @@ import SignUp from "layouts/authentication/sign-up";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
+import Products from "./layouts/products";
+import Categories from "layouts/categories";
+// import Loading from "components/Loading/index";
 
 const routes = [
   {
     type: "collapse",
     name: "Dashboard",
     key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
+    icon: <Icon fontSize="large">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
+    name: "Produtos",
+    key: "produtos",
     icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
+    route: "/produtos",
+    component: <Products />,
   },
   {
     type: "collapse",
-    name: "Billing",
-    key: "billing",
+    name: "Categorias",
+    key: "categories",
     icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
-  },
-  {
-    type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
+    route: "/categories",
+    component: <Categories />,
   },
   {
     type: "collapse",
@@ -101,7 +96,7 @@ const routes = [
     type: "collapse",
     name: "Sign In",
     key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
+    icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
   },
@@ -113,6 +108,13 @@ const routes = [
     route: "/authentication/sign-up",
     component: <SignUp />,
   },
+  //   {
+  //     type: "component",
+  //     name: "Loading",
+  //     key: "loading",
+  //     route: "/components/Loading",
+  //     component: <Loading />,
+  //   },
 ];
 
 export default routes;
